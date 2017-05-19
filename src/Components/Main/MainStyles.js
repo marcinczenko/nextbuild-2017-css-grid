@@ -17,20 +17,12 @@ const styles = {
 export default class MainStyles {
   static get() {
     let grid = new Grid([
-      'a a a',
-      'b b b',
-      'c d e', 
-      'c d e', 
-      'c d f', 
-      'g g f'
-    ], [
-      'header',
-      'horizontalMenu',
-      'sidePanelLeft',
-      'content',
-      'sidePanelRight',
-      'messanger',
-      'statusBar'
+      'header         header         header',
+      'horizontalMenu horizontalMenu horizontalMenu',
+      'sidePanelLeft  content        sidePanelRight', 
+      'sidePanelLeft  content        sidePanelRight', 
+      'sidePanelLeft  content        messanger', 
+      'statusBar      statusBar      messanger'
     ]);
 
     const gridStyles = grid.applyToStyles(styles);

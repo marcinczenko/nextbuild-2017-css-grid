@@ -1,7 +1,6 @@
 export default class Grid {
   constructor(grid, sections) {
     this.grid = grid;
-    this.sections = sections;
   }
 
   getGridTemplateAreas() {
@@ -11,7 +10,7 @@ export default class Grid {
   }
 
   getGridTemplateColumns() {
-    const columns = Math.max(...this.grid.map((e) => e.split(' ').length));
+    const columns = Math.max(...this.grid.map((e) => e.split(/\s\s+/).length));
     return [...Array(columns).keys()].map(() => '1fr').join(' ');
   }
 
@@ -20,9 +19,9 @@ export default class Grid {
   }
 
   applyToStyles(styles) {
-    const gridAreaCodesIter = new Set(this.grid.join(' ').split(' ')).values();
-    const gridAreas = this.sections.reduce((acc, value, index) => {
-      acc[value] = { gridArea: gridAreaCodesIter.next().value };
+    const sections = new Set(this.grid.join(' ').split(/\s\s*/));
+    const gridAreas = [...sections].reduce((acc, value) => {
+      acc[value] = { gridArea: value };
       return acc;
     }, {});
 

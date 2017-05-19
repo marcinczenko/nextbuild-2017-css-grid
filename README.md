@@ -2,17 +2,35 @@
 
 This project describes a journey from ugly, old-fashined, css-based styling to fresh, modern and exciting way of building the styling with javascript - as demonstrated during live coding session at [NextBuild 2017](http://nextbuild.nl). You may disagree...that's ok with me.
 
-Anyway, this demo project encourages the experimentation with expressing css in javascript. CSS in Javascript allows for more declariative DSLs and can leverage the codding conventions.
+### Instalation
+
+After cloning run:
+
+```shell
+$ yarn install
+```
+
+To start the development server:
+
+```shell
+$ yarn start
+```
+
+Open the browser and go to [http://localhost:3000/](http://localhost:3000/).
+
+### Discussion
+
+This demo project encourages the experimentation with expressing css in javascript. CSS in Javascript allows for more declariative DSLs and can leverage the codding conventions.
 
 An example here is very immature (I have put it all together in a couple of hours as demo) implementation of a `Grid` class, which should take away lots of boilerplate code, making creating the grid-based layout of a page much easier and cleaner. A demo is in React - my favorite environment.
 
-So, how could it work.
+So, how could it work?
 
-So, you build a grid-based layout, and you want your grid to look like this:
+Let's assume that you build a grid-based layout, and you want your grid to look like this:
 
 ![image of grid](images/grid.png)
 
-It is maybe a bit overcomplicated, but not impossible for in many cases, but it already requires lots of markup. A ready to use markup may look like this:
+It is maybe a bit overcomplicated, but not impossible in many cases, yet it already requires lots of markup. A ready to use markup may look like this:
 
 ```javascript
 <div class="container">
@@ -79,7 +97,8 @@ section {
   grid-area: status-bar;
 }
 ```
-I think it is already quite readbale comparing to waht you would have to do with e.g. flex, but I still feel it is also quite verbose and in the end error-prone.
+
+I think it is already quite readbale comparing to what you would have if you try to achieve the same with e.g. flex, but I still feel it is also quite verbose and, in the end, error-prone.
 
 The key to understanding the actual layout (without looking at the end result of course), is to look at the `grid-template-areas` CSS property:
 
@@ -93,7 +112,7 @@ grid-template-areas:
     "status-bar status-bar messanger";
 ```
 
-This, again is not very bad, but in my opinion already presents unnecessary coupling between the purpose of the element (e.g. header) and its position on the grid. Moreover, I find this notation quite verbose, a bit cluttered, and in the end also error-prone. A first step towards even more declarative description of the grid may look as follows:
+This, again is not very bad, but one may say that it already presents unnecessary coupling between the purpose of the element (e.g. header) and its position on the grid. Moreover, I find this notation quite verbose, a bit cluttered, and in the end also error-prone. A first step towards even more declarative description of the grid may look as follows:
 
 ```css
 grid-template-areas:
@@ -164,4 +183,21 @@ const gridStyles = grid.applyToStyles({});
 
 The `applyToStyles` method takes styles object as an argument and it will extend it with a style for the `container` grid element and it will also correctly assign the grid areas.
 
-But what seemed to be an adantage in pure CSS - separating the grid description from the purpose of the content - is no longer an advantage in Javascript. The order of the elements in the second array passed to the `Grid` constructor matters and should correspond to the sequential alphabet letters we see in the first array argument.
+But what seemed to be an advantage in pure CSS - separating the grid description from the purpose of the content - is no longer an advantage in Javascript. The order of the elements in the second array passed to the `Grid` constructor does matter and should correspond to the sequential alphabet letters we see in the first array argument. It is not very complicated, but make making a mistake easier. We see thus, that we would be much better off if we use the following `Grid` interface:
+
+```javascript
+let grid = new Grid([
+  'header         header         header',
+  'horizontalMenu horizontalMenu horizontalMenu',
+  'sidePanelLeft  content        sidePanelRight', 
+  'sidePanelLeft  content        sidePanelRight', 
+  'sidePanelLeft  content        messanger', 
+  'statusBar      statusBar      messanger'
+]);
+
+const gridStyles = grid.applyToStyles(styles);
+```
+
+And this is what we see in the final commit in this repository.
+
+This is a very trivial demo, but imagine if we really leverage the `Grid` API, so that it also allows for a bit more specialization. I think it would make our work with CSS Grid way easier.
