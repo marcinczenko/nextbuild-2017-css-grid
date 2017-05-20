@@ -2,6 +2,10 @@
 
 This project describes a journey from ugly, old-fashined, css-based styling to fresh, modern and exciting way of building the styling with javascript - as demonstrated during live coding session at [NextBuild 2017](http://nextbuild.nl). You may disagree...that's ok with me.
 
+> You can access the finished (and even slightly more elaborate) example CodePens at: [https://codepen.io/collection/nmOOVE/](https://codepen.io/collection/nmOOVE/).
+
+> The slides from the talk are also here in the repo: [NextBuild2017.pdf](NextBuild2017.pdf).
+
 ### Instalation
 
 After cloning run:
