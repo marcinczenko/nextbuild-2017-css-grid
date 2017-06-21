@@ -1,6 +1,23 @@
 export default class Grid {
-  constructor(grid, sections) {
+
+  constructor(grid, modifiers) {
     this.grid = grid;
+    this.modifiers = modifiers;
+    this.defaultContainerStyles = {
+      display: 'grid',
+      gridGap: '5px',
+      gridTemplateAreas: this.getGridTemplateAreas(),
+      gridTemplateColumns: this.getGridTemplateColumns(),
+      gridTemplateRows: this.getGridTemplateRows()
+    };
+    Object.assign(this, { 
+      container: {
+        ...this.defaultContainerStyles, 
+        ...this.modifiers
+      }
+    });
+
+    this.createGridAreas();
   }
 
   getGridTemplateAreas() {
@@ -19,22 +36,29 @@ export default class Grid {
   }
 
   applyToStyles(styles) {
-    const sections = new Set(this.grid.join(' ').split(/\s\s*/));
-    const gridAreas = [...sections].reduce((acc, value) => {
+    const gridAreas = new Set(this.grid.join(' ').split(/\s\s*/));
+    const gridElements = [...gridAreas].reduce((acc, value) => {
       acc[value] = { gridArea: value };
       return acc;
     }, {});
 
     return { 
       ...styles,
-      container: {
-        display: 'grid',
-        gridGap: '5px',
-        gridTemplateAreas: this.getGridTemplateAreas(),
-        gridTemplateColumns: this.getGridTemplateColumns(),
-        gridTemplateRows: this.getGridTemplateRows()
-      },
-      ...gridAreas
+      container: {...this.defaultContainerStyles, ...this.modifiers},  
+      ...gridElements
     };
+  }
+
+  getGridContainerStyle() {
+    return {...this.defaultContainerStyles, ...this.modifiers};
+  }
+
+  createGridAreas() {
+    const gridAreas = new Set(this.grid.join(' ').split(/\s\s*/));
+    const gridElements = [...gridAreas].reduce((acc, value) => {
+      acc[value] = { gridArea: value };
+      return acc;
+    }, {});
+    Object.assign(this, gridElements);
   }
 };

@@ -1,25 +1,36 @@
 import React, { Component } from 'react';
 
-import MainStyles from './MainStyles';
+import MainGrid, { HeaderGridItem, HorizontalMenuGridItem, SidePanelLeftGridItem, 
+  ContentGridItem, SidePanelRightGridItem, MessengerGridItem,
+  StatusBarGridItem } from './MainGrid';
 
 class Main extends Component {
 
-  constructor() {
-    super();
-    this.styles = MainStyles.get();
-  }
-
   render() {
     return (
-      <div style={this.styles.container}>
-        <section style={this.styles.header}>header</section>
-        <section style={this.styles.horizontalMenu}>horizontal-menu</section>
-        <section style={this.styles.sidePanelLeft}>side-panel-left</section>
-        <section style={this.styles.content}>content</section>
-        <section style={this.styles.sidePanelRight}>side-panel-right</section>
-        <section style={this.styles.messanger}>messanger</section>
-        <section style={this.styles.statusBar}>status-bar</section>
-      </div>
+      <MainGrid>
+        <HeaderGridItem>
+          HeaderComponent
+        </HeaderGridItem>
+        <HorizontalMenuGridItem>
+          HorizontalMenuComponent
+        </HorizontalMenuGridItem>
+        <SidePanelLeftGridItem>
+          SidePanelLeftComponent
+        </SidePanelLeftGridItem>
+        <ContentGridItem>
+          ContentComponent
+        </ContentGridItem>
+        <SidePanelRightGridItem>
+          SidePanelRightComponent
+        </SidePanelRightGridItem>
+        <MessengerGridItem>
+          MessengerComponent
+        </MessengerGridItem>
+        <StatusBarGridItem>
+          StatusBarComponent
+        </StatusBarGridItem>
+      </MainGrid>
     );
   }
 }

@@ -2,9 +2,7 @@
 
 This project describes a journey from ugly, old-fashined, css-based styling to fresh, modern and exciting way of building the styling with javascript - as demonstrated during live coding session at [NextBuild 2017](http://nextbuild.nl). You may disagree...that's ok with me.
 
-> You can access the finished (and even slightly more elaborate) example CodePens at: [https://codepen.io/collection/nmOOVE/](https://codepen.io/collection/nmOOVE/).
-
-> The slides from the talk are also here in the repo: [NextBuild2017.pdf](NextBuild2017.pdf).
+> You can access the finished (and even slightly more elaborate) example CodePens at: [https://codepen.io/collection/XoYrVY/](https://codepen.io/collection/XoYrVY/).
 
 ### Instalation
 
@@ -43,7 +41,7 @@ It is maybe a bit overcomplicated, but not impossible in many cases, yet it alre
   <section class="side-panel-left">side-panel-left</section>
   <section class="content">content</section>
   <section class="side-panel-right">side-panel-right</section>
-  <section class="messanger">messanger</section>
+  <section class="messenger">messenger</section>
   <section class="status-bar">status-bar</section>
 </div>
 ```
@@ -59,8 +57,8 @@ and the associated styling may look like that:
     "horizontal-menu horizontal-menu horizontal-menu"
     "side-panel-left content side-panel-right"
     "side-panel-left content side-panel-right"
-    "side-panel-left content messanger"
-    "status-bar status-bar messanger";
+    "side-panel-left content messenger"
+    "status-bar status-bar messenger";
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
@@ -93,8 +91,8 @@ section {
   grid-area: side-panel-right;
 }
 
-.messanger {
-  grid-area: messanger;
+.messenger {
+  grid-area: messenger;
 }
 
 .status-bar {
@@ -112,8 +110,8 @@ grid-template-areas:
     "horizontal-menu horizontal-menu horizontal-menu"
     "side-panel-left content side-panel-right"
     "side-panel-left content side-panel-right"
-    "side-panel-left content messanger"
-    "status-bar status-bar messanger";
+    "side-panel-left content messenger"
+    "status-bar status-bar messenger";
 ```
 
 This, again is not very bad, but one may say that it already presents unnecessary coupling between the purpose of the element (e.g. header) and its position on the grid. Moreover, I find this notation quite verbose, a bit cluttered, and in the end also error-prone. A first step towards even more declarative description of the grid may look as follows:
@@ -151,7 +149,7 @@ Here, we use sequential alphabet letters - the description becomes shorter, and 
   grid-area: e;
 }
 
-.messanger {
+.messenger {
   grid-area: f;
 }
 
@@ -178,7 +176,7 @@ let grid = new Grid([
   'sidePanelLeft',
   'content',
   'sidePanelRight',
-  'messanger',
+  'messenger',
   'statusBar'
 ]);
 
@@ -195,11 +193,130 @@ let grid = new Grid([
   'horizontalMenu horizontalMenu horizontalMenu',
   'sidePanelLeft  content        sidePanelRight', 
   'sidePanelLeft  content        sidePanelRight', 
-  'sidePanelLeft  content        messanger', 
-  'statusBar      statusBar      messanger'
+  'sidePanelLeft  content        messenger', 
+  'statusBar      statusBar      messenger'
 ]);
 
 const gridStyles = grid.applyToStyles(styles);
+```
+
+We can still do better: [glamorous](https://github.com/paypal/glamorous).
+
+#### Using glamorous with Grid
+
+[Glamorous](https://github.com/paypal/glamorous) is an interstring approach to do styling in React. It is inspired by [styled-components](https://www.styled-components.com) and I encourage you to consult both and make your own opinion. I decided to use glamorous because it is using styles as native Javascript objects rather than interpolated strings we see in *styled-components*.
+
+With glamorous we can settle down on some conventions on how to approach styling in our javascript code - specially when we have component-based architecture in mind. An example convention might be as follows. If you have a React component that needs a grid, just create a file with Grid suffix with the content similar to the one below (here we have a component named `Main` and thus the *grid* module is `MainGrid.js`):
+
+```javascript
+import glamorous from 'glamorous';
+import Grid from '../../Helpers/Grid';
+import maxContent from '../../Helpers/MaxContent';
+
+let grid = new Grid([
+  'header         header         header',
+  'horizontalMenu horizontalMenu horizontalMenu',
+  'sidePanelLeft  content        sidePanelRight', 
+  'sidePanelLeft  content        sidePanelRight', 
+  'sidePanelLeft  content        messenger', 
+  'statusBar      statusBar      messenger'
+], {
+  gridTemplateRows: `${maxContent()} ${maxContent()} 1fr 1fr 1fr 1fr`
+});
+
+const gridItemLayout = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '28px',
+  backgroundColor: 'CadetBlue',
+  padding: '5px'
+}
+
+const MainGrid = glamorous.div(grid.container, {height: '100vh', padding: '5px', boxSizing: 'border-box'});
+
+const HeaderGridItem = glamorous.div(grid.header, gridItemLayout);
+
+const HorizontalMenuGridItem = glamorous.div(grid.horizontalMenu, gridItemLayout);
+
+const SidePanelLeftGridItem = glamorous.div(grid.sidePanelLeft, gridItemLayout);
+
+const ContentGridItem = glamorous.div(grid.content, gridItemLayout);
+
+const SidePanelRightGridItem = glamorous.div(grid.sidePanelRight, gridItemLayout);
+
+const MessengerGridItem = glamorous.div(grid.messenger, gridItemLayout);
+
+const StatusBarGridItem = glamorous.div(grid.statusBar, gridItemLayout);
+
+export default MainGrid;
+export { HeaderGridItem, HorizontalMenuGridItem, SidePanelLeftGridItem, 
+  ContentGridItem, SidePanelRightGridItem, MessengerGridItem,
+  StatusBarGridItem };
+```
+
+Comparing to the previous example I have adjusted the Grid.js file to be easier to use with glamorous (and perhaps with any other javascript code - it is really work in progress). The `Grid` constructor now takes two arguments: the value of `grid-template-areas` CSS property (as an array of strings, each element corresponding to a row), and optionally an object containing the values for the properties we want to overwrite. Here we modify the `gridTemplateRows` so that it accomodates the height of the `header` and the `horizontalMenu` by using the `max-content` property value. The `max-content` and the `minmax` functions introduced with CSS grid are still not handled well by auto-prefixer (as it is the case for all CSS properties that require auto-prefixing on the property values rather than on the propery names themselves). I intend to provide a sligtly more detailed description of the problem and the solution, but for the moment, just use the `maxContent()` function in the interpolated string as I show in the example above.
+
+After construction, the returned `grid` object provides properties named after the grid template areas, holding the necessary styling for the given grid item. Additionally, the grid object will have a `container` property holding the style for grid container element.
+
+We want the all the grid items to receive the following basic styling:
+
+```javascript
+const gridItemLayout = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '28px',
+  backgroundColor: 'CadetBlue',
+  padding: '5px'
+}
+```
+
+It should be very basic as the compenents that you put inside the gird cells should style themselves - they know better how they want to look like. In our example, the last three properties are added just to make example slightly more visual - what they would most probably be managed by the components themselves.
+
+Using *glamorous*, we conveniently merge the grid styling with the `gridItemLayout`. Where appropriate, we modify the basic styling of the container or the grid items to accomodate our specific needs. Glamorous makes that all very easy.
+
+In the end we export the grid container (here `MainGrid`) and the all glamorous grid item components that we then import and use in the `Main.js` file to create the actual grid:
+
+```javascript
+import React, { Component } from 'react';
+
+import MainGrid, { HeaderGridItem, HorizontalMenuGridItem, SidePanelLeftGridItem, 
+  ContentGridItem, SidePanelRightGridItem, MessengerGridItem,
+  StatusBarGridItem } from './MainGrid';
+
+class Main extends Component {
+
+  render() {
+    return (
+      <MainGrid>
+        <HeaderGridItem>
+          HeaderComponent
+        </HeaderGridItem>
+        <HorizontalMenuGridItem>
+          HorizontalMenuComponent
+        </HorizontalMenuGridItem>
+        <SidePanelLeftGridItem>
+          SidePanelLeftComponent
+        </SidePanelLeftGridItem>
+        <ContentGridItem>
+          ContentComponent
+        </ContentGridItem>
+        <SidePanelRightGridItem>
+          SidePanelRightComponent
+        </SidePanelRightGridItem>
+        <MessengerGridItem>
+          MessengerComponent
+        </MessengerGridItem>
+        <StatusBarGridItem>
+          StatusBarComponent
+        </StatusBarGridItem>
+      </MainGrid>
+    );
+  }
+}
+
+export default Main;
 ```
 
 And this is what we see in the final commit in this repository.
